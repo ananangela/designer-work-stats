@@ -180,6 +180,10 @@ def get_category_stats():
         if not original_category or original_category == '類別':
             original_category = '未分類'
 
+        # 合併商品頁分類
+        if '商品頁' in original_category:
+            original_category = '商品頁'
+
         category_stats[original_category] += 1
 
     return dict(category_stats)
