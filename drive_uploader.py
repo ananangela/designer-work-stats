@@ -16,8 +16,11 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 def get_drive_service():
     """Authenticate and return Google Drive service"""
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    drive_token_file = 'token_drive.pickle'
+
+    # Use separate token file for Drive to avoid scope conflicts
+    if os.path.exists(drive_token_file):
+        with open(drive_token_file, 'rb') as token:
             creds = pickle.load(token)
 
     if not creds or not creds.valid:
@@ -30,7 +33,7 @@ def get_drive_service():
                 credentials_file, SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open('token.pickle', 'wb') as token:
+        with open(drive_token_file, 'wb') as token:
             pickle.dump(creds, token)
 
     return build('drive', 'v3', credentials=creds)
