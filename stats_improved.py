@@ -6,6 +6,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from collections import defaultdict
 from auth_helper import get_credentials_file
+from data_manager import DataManager
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SHEET_ID = '1K3VVKGJn47UTxGy7UGQtnkrO5yDVR9Bp7fHjMDVkv7w'
@@ -236,6 +237,11 @@ def stats_improved():
 
     sorted_original_stats = sorted(category_original_stats.items(), key=lambda x: x[1], reverse=True)
     total_original = sum(category_original_stats.values())
+
+    # Save data to JSON files
+    dm = DataManager()
+    dm.save_raw_data(all_data)
+    dm.save_statistics(category_stats, category_original_stats)
 
     print(f"\n{'類別':<30} {'數量':>10}")
     print("-" * 45)
