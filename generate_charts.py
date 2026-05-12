@@ -149,6 +149,41 @@ def get_stats():
 
     return dict(category_stats)
 
+def get_category_stats():
+    """按表單原始「類別」欄進行統計"""
+    service = get_sheets_service()
+    sheet = service.spreadsheets()
+
+    result = sheet.values().get(spreadsheetId=SHEET_ID, range='2026').execute()
+    values = result.get('values', [])
+
+    category_stats = defaultdict(int)
+
+    for i in range(2, len(values)):
+        row = values[i]
+
+        if not row or len(row) == 0:
+            continue
+
+        date_str = row[0] if len(row) > 0 else ''
+
+        if '-' in date_str or not date_str:
+            continue
+
+        date_tuple = parse_date(date_str)
+
+        if not is_in_range(date_tuple):
+            continue
+
+        # 取得原始「類別」欄（列索引 3）
+        original_category = row[3] if len(row) > 3 else ''
+        if not original_category or original_category == '類別':
+            original_category = '未分類'
+
+        category_stats[original_category] += 1
+
+    return dict(category_stats)
+
 def generate_charts():
     stats = get_stats()
 
@@ -251,11 +286,45 @@ def generate_charts():
     plt.savefig('chart_table.png', dpi=300, bbox_inches='tight')
     print("✓ 統計表已保存: chart_table.png")
 
+    # 圖表 4: 按「類別」分類的柱狀圖
+    category_stats = get_category_stats()
+    sorted_category_stats = sorted(category_stats.items(), key=lambda x: x[1], reverse=True)
+    category_names = [item[0] for item in sorted_category_stats]
+    category_values = [item[1] for item in sorted_category_stats]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars = ax.bar(category_names, category_values, color=colors[:len(category_names)], edgecolor='black', linewidth=1.5)
+
+    # 在柱子上添加數值
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width()/2., height,
+                f'{int(height)}',
+                ha='center', va='bottom', fontsize=12, fontweight='bold')
+
+    ax.set_xlabel('類別', fontsize=14, fontweight='bold')
+    ax.set_ylabel('工作項目數量', fontsize=14, fontweight='bold')
+    ax.set_title('前兩週設計工作統計\n（按「類別」分類）', fontsize=16, fontweight='bold', pad=20)
+    ax.set_ylim(0, max(category_values) * 1.15)
+
+    # 旋轉 x 軸標籤
+    plt.xticks(rotation=45, ha='right', fontsize=11)
+    plt.yticks(fontsize=11)
+
+    # 添加網格
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
+    ax.set_axisbelow(True)
+
+    plt.tight_layout()
+    plt.savefig('chart_category.png', dpi=300, bbox_inches='tight')
+    print("✓ 「類別」分類柱狀圖已保存: chart_category.png")
+
     print("\n圖表生成完成！")
-    print(f"文件位置: /Users/a01-0220-0066/auto_workflow/")
-    print(f"  - chart_bar.png（柱狀圖）")
-    print(f"  - chart_pie.png（圓餅圖）")
-    print(f"  - chart_table.png（統計表）")
+    print(f"文件位置: /Users/a01-0220-0066/designer_work_stats/")
+    print(f"  - chart_bar.png（前兩週產品類別柱狀圖）")
+    print(f"  - chart_pie.png（產品類別圓餅圖）")
+    print(f"  - chart_table.png（統計詳表）")
+    print(f"  - chart_category.png（「類別」分類柱狀圖）")
 
 if __name__ == '__main__':
     generate_charts()

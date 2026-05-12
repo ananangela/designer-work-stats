@@ -41,11 +41,11 @@ def parse_date(date_str):
     return None
 
 def get_previous_week_range():
-    """計算前一週的日期範圍 (過去 7 天)"""
+    """計算前兩週的日期範圍 (過去 14 天)"""
     from datetime import datetime, timedelta
 
     today = datetime.now()
-    week_start = today - timedelta(days=7)
+    week_start = today - timedelta(days=14)
 
     return week_start, today
 
@@ -203,7 +203,7 @@ def stats_improved():
     date_range = f"{week_start.strftime('%Y/%m/%d')} - {week_end.strftime('%Y/%m/%d')}"
 
     print("\n" + "="*80)
-    print(f"【前一週工作統計（{date_range}）】")
+    print(f"【前兩週工作統計（{date_range}）】")
     print("="*80)
 
     if not category_stats:
@@ -223,6 +223,28 @@ def stats_improved():
 
     print("-" * 35)
     print(f"{'總計':<20} {total:>10}")
+
+    # 計算按「類別」的統計
+    print("\n" + "="*80)
+    print("【按「類別」統計（表單原始分類）】")
+    print("="*80)
+
+    category_original_stats = defaultdict(int)
+    for item in all_data:
+        original_category = item['category'] if item['category'] else '未分類'
+        category_original_stats[original_category] += 1
+
+    sorted_original_stats = sorted(category_original_stats.items(), key=lambda x: x[1], reverse=True)
+    total_original = sum(category_original_stats.values())
+
+    print(f"\n{'類別':<30} {'數量':>10}")
+    print("-" * 45)
+
+    for category, count in sorted_original_stats:
+        print(f"{category:<30} {count:>10}")
+
+    print("-" * 45)
+    print(f"{'總計':<30} {total_original:>10}")
 
     # 輸出詳細數據
     print("\n" + "="*80)
