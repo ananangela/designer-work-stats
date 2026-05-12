@@ -5,6 +5,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from collections import defaultdict
+from auth_helper import get_credentials_file
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SHEET_ID = '1K3VVKGJn47UTxGy7UGQtnkrO5yDVR9Bp7fHjMDVkv7w'
@@ -19,8 +20,10 @@ def get_sheets_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            # Use auth_helper to get credentials file
+            credentials_file = get_credentials_file()
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                credentials_file, SCOPES)
             creds = flow.run_local_server(port=0)
 
         with open('token.pickle', 'wb') as token:
