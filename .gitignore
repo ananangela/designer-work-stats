@@ -1,3 +1,6 @@
 credentials.json
 data/
 token.pickle
+token_drive.pickle
+chart_*.png
+presentation_*.png
