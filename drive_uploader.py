@@ -93,7 +93,8 @@ def upload_charts_to_drive(parent_folder_id):
     files_to_upload = [
         'chart_bar.png',
         'chart_pie.png',
-        'chart_table.png'
+        'chart_table.png',
+        'chart_category.png'
     ]
 
     uploaded_files = []
