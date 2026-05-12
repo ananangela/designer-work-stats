@@ -259,3 +259,23 @@ def generate_charts():
 
 if __name__ == '__main__':
     generate_charts()
+
+    # Upload charts to Google Drive
+    print("\n" + "="*80)
+    print("📤 上傳圖表到 Google Drive...")
+    print("="*80)
+
+    try:
+        from drive_uploader import upload_charts_to_drive
+        GOOGLE_DRIVE_FOLDER_ID = '16RwtvEIZFYwelmTQunLAk9K5H5O8J4tM'
+        uploaded = upload_charts_to_drive(GOOGLE_DRIVE_FOLDER_ID)
+
+        if uploaded:
+            print(f"\n✅ 成功上傳 {len(uploaded)} 個檔案到 Google Drive")
+            for file_info in uploaded:
+                print(f"   - {file_info['name']}")
+        else:
+            print("⚠️  沒有檔案被上傳")
+    except Exception as e:
+        print(f"❌ Google Drive 上傳失敗: {str(e)}")
+        print("   圖表仍然保存在本地目錄")
