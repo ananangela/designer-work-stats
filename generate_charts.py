@@ -289,7 +289,14 @@ def generate_charts():
     # 圖表 4: 按「類別」分類的柱狀圖
     category_stats = get_category_stats()
     sorted_category_stats = sorted(category_stats.items(), key=lambda x: x[1], reverse=True)
-    category_names = [item[0] for item in sorted_category_stats]
+
+    # 簡化標籤：移除括號內容
+    def simplify_label(label):
+        if '（' in label:
+            return label.split('（')[0]
+        return label
+
+    category_names = [simplify_label(item[0]) for item in sorted_category_stats]
     category_values = [item[1] for item in sorted_category_stats]
 
     fig, ax = plt.subplots(figsize=(12, 6))
